@@ -59,15 +59,11 @@ def giraRoleta(soma, roleta):
 # Seleciona os indíviduos com o método de roleta 
 def selecaoRoleta (pop):
     pares = []
-    fitnessSoma = 0
     roleta = []
-    for i in range(len(pop)):
-        fitnessSoma = pop[i]['fitness'] + fitnessSoma
-
     soma = 0
 
     for i in range(len(pop)):
-        if(i == 0):
+        if i == 0:
             roleta.insert(i, pop[i]['fitness'])
             soma = pop[i]['fitness']
         else:
@@ -93,10 +89,10 @@ def duelo (pop):
     ind1 = random.randrange(0, len(pop))
     ind2 = random.randrange(0, len(pop))
 
-    if(ind1 == ind2):
+    if ind1 == ind2:
         ind2 = random.randrange(0, len(pop))
 
-    if(pop[ind1]['fitness'] > pop[ind2]['fitness']):
+    if pop[ind1]['fitness'] > pop[ind2]['fitness']:
         indVencedor = ind1
     else:
         indVencedor = ind2
@@ -109,9 +105,9 @@ def selecaoTorneio(pop):
     for i in range(len(pop)):
         idx_ind1 = duelo(pop)
         idx_ind2 = duelo(pop)
-        if(idx_ind2 == idx_ind1):
+        if idx_ind2 == idx_ind1:
             idx_ind2 = duelo(pop)
-            if(idx_ind2 == idx_ind1):
+            if idx_ind2 == idx_ind1:
                 idx_ind2 = idx_ind1 + 1
     
         pares.insert(i, {'ind1': pop[idx_ind1], 'ind2': pop[idx_ind2]})
@@ -124,7 +120,7 @@ def cruzamentoUmponto(ind1, ind2):
     pc = random.randint(0, GENES-1)
 
     for i in range(GENES):
-        if(i <= pc):
+        if i <= pc:
             genes_filho.append( ind1['genes'][i])
         else:
             genes_filho.append( ind2['genes'][i])
@@ -142,9 +138,9 @@ def cruzamentoDoispontos(ind1, ind2):
     pc2 = random.randint(pc1, GENES-1)
 
     for i in range(GENES):
-        if(i <= pc1):
+        if i <= pc1:
             genes_filho.append(ind1['genes'][i])
-        elif(i > pc1 and i <= pc2):
+        elif i > pc1 and i <= pc2:
             genes_filho.append(ind2['genes'][i])
         else:
             genes_filho.append(ind1['genes'][i])
@@ -161,7 +157,7 @@ def mutacao(ind):
         'genes': ind['genes'].copy(),
         'fitness': 0
     }
-    if(indMutado['genes'][geneAleatorio] == 0):
+    if indMutado['genes'][geneAleatorio] == 0:
         indMutado['genes'][geneAleatorio] = 1
     else:
         indMutado['genes'][geneAleatorio] = 0
@@ -182,17 +178,17 @@ def operadoresGeneticos(pares, opCruzamento):
         probCruzamento = random.random()
         probMutacao = random.random()
         
-        if(probCruzamento <= PROB_CRUZAMENTO):
-            if(opCruzamento == 1):
+        if probCruzamento <= PROB_CRUZAMENTO:
+            if opCruzamento == 1:
                 filho = cruzamentoUmponto(ind1, ind2)
             else:
                 filho = cruzamentoDoispontos(ind1, ind2)
-        elif(probCruzamento < 0.5):
+        elif probCruzamento < 0.5:
             filho = ind1
         else:
             filho = ind2
 
-        if(probMutacao <= PROB_MUTACAO):
+        if probMutacao <= PROB_MUTACAO:
             filho = mutacao(filho)
     
 
@@ -206,7 +202,7 @@ def operadoresGeneticos(pares, opCruzamento):
 def elitismo(pop_antiga, pop_nova):
     melhorElemento = 0
     for i in range(len(pop_antiga)):
-        if(pop_antiga[i]['fitness'] > pop_antiga[melhorElemento]['fitness']):
+        if pop_antiga[i]['fitness'] > pop_antiga[melhorElemento]['fitness']:
             melhorElemento = i
     
     pop_nova[0] = pop_antiga[melhorElemento]
@@ -224,7 +220,7 @@ def fitnessMedio(pop):
 def melhorElemento(pop):
     melhorElemento = 0
     for i in range(len(pop)):
-        if(pop[i]['fitness'] > pop[melhorElemento]['fitness']):
+        if pop[i]['fitness'] > pop[melhorElemento]['fitness']:
             melhorElemento = i
 
     return pop[i]['fitness']
@@ -262,6 +258,8 @@ def main():
     yMedia = []
     xMelhorInd = []
     yMelhorInd = []
+    xSolucaoOtima = []
+    ySolucaoOtima = []
     while geracao < MAX_GERACOES:
 
         print("Geração: ", geracao)
@@ -269,7 +267,7 @@ def main():
         # print("Melhor elemento >>>", melhorElemento(Populacao))
         # print("Media da populacao >>>", fitnessMedio(Populacao))
         
-        if(Op_Selecao == 1):
+        if Op_Selecao == 1:
             pares = selecaoRoleta(Populacao)
         else:
             pares = selecaoTorneio(Populacao)
@@ -277,7 +275,7 @@ def main():
         popFilha = operadoresGeneticos(pares, Op_Cruzamento)
         avaliacao(popFilha)
 
-        if(Op_Elitismo == 1):
+        if Op_Elitismo == 1:
             elitismo(Populacao, popFilha)
             Populacao = popFilha
         else:
@@ -289,6 +287,8 @@ def main():
         y = float(fitnessMedio(Populacao))
         xInd = geracao
         yInd = float(melhorElemento(Populacao))
+        xSolucaoOtima.append(geracao)
+        ySolucaoOtima.append(27)
 
         xMedia.append(x) 
         yMedia.append(y)
@@ -300,7 +300,8 @@ def main():
 
     plt.figure(figsize=(5, 2.7), layout='constrained')
     plt.plot(xMedia, yMedia, label='Media das populações') 
-    plt.plot(xMelhorInd, yMelhorInd, label='Melhor indivíduo da população')  
+    plt.plot(xMelhorInd, yMelhorInd, label='Melhor indivíduo da população') 
+    plt.plot(xSolucaoOtima, ySolucaoOtima, label='Solução ótima conhecida')
     plt.xlabel('Gerações')
     plt.ylabel('Fitness')
     plt.title("Evolução do fitness")
