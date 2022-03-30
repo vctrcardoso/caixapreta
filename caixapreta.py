@@ -111,7 +111,7 @@ def selecaoTorneio(pop):
             if idx_ind2 == idx_ind1:
                 idx_ind2 = idx_ind1 + 1
     
-        pares.insert(i, {'ind1': pop[idx_ind1], 'ind2': pop[idx_ind2]})
+        pares.append({'ind1': pop[idx_ind1], 'ind2': pop[idx_ind2]})
 
     return pares
 
@@ -214,10 +214,11 @@ def elitismo(pop_antiga, pop_nova):
 # Calcula a media de Fitness de uma populacao
 def fitnessMedio(pop):
     soma = 0
+    total = len(pop)
     for ind in pop:
         soma = ind['fitness'] + soma
 
-    media = soma / len(pop)
+    media = soma / total
 
     return media
 
@@ -228,29 +229,44 @@ def melhorElemento(pop):
         if pop[i]['fitness'] > pop[melhorElemento]['fitness']:
             melhorElemento = i
 
-    return pop[i]['fitness']
+    return pop[melhorElemento]['fitness']
             
+def piorElemento(pop):
+    piorElemento = 0
+    for i in range(len(pop)):
+        if pop[i]['fitness'] < pop[piorElemento]['fitness']:
+            piorElemento = i
+
+    return pop[piorElemento]['fitness']
 
 # LOOP principal do AG
 
 
 def main():
 
-    print ('MENU DE CONFIGURAÇÃO DO SISTEMA \n')
+    print ('MENU DE CONFIGURAÇÃO DO AG \n')
+    print('-----------------------------------------------------------------------------------------------')
     print ('Defina a quantidade de indivíduos da população: ')
     TAM_POPULACAO = int(input('Resposta: '))
+    print('-----------------------------------------------------------------------------------------------')
     print ('Escolha o tipo de seleção que deseja utilizar: (1) Roleta (2) Torneio')
     Op_Selecao = int(input('Resposta: '))
+    print('-----------------------------------------------------------------------------------------------')
     print ('Escolha o tipo de cruzamento que deseja utilizar: (1) 1 ponto de corte (2) 2 pontos de corte')
     Op_Cruzamento = (input('Resposta: '))
+    print('-----------------------------------------------------------------------------------------------')
     print ('Defina probabilidade de mutação que deseja utilizar: (de 1 a 100)')
     PROB_MUTACAO = float(input('Resposta: '))
+    print('-----------------------------------------------------------------------------------------------')
     print ('Defina a probabilidade de cruzamento: (de 1 a 100)')
     PROB_CRUZAMENTO = float(input('Resposta: '))
+    print('-----------------------------------------------------------------------------------------------')
     print ('Deseja utilizar o elitismo no algoritmo: (1) Sim (2) Não')
     Op_Elitismo = int(input('Resposta: '))
+    print('-----------------------------------------------------------------------------------------------')
     print ('Defina a quantidade de gerações: ')
     MAX_GERACOES = int(input('Resposta: '))
+    print('\n')
 
     PROB_MUTACAO = PROB_MUTACAO / 100
     PROB_CRUZAMENTO = PROB_CRUZAMENTO / 100
@@ -263,6 +279,8 @@ def main():
     yMedia = []
     xMelhorInd = []
     yMelhorInd = []
+    xPiorInd = []
+    yPiorInd = []
     xSolucaoOtima = []
     ySolucaoOtima = []
     with tqdm(total=MAX_GERACOES) as geracoes:
@@ -274,6 +292,8 @@ def main():
 
             # print("Melhor elemento >>>", melhorElemento(Populacao))
             # print("Media da populacao >>>", fitnessMedio(Populacao))
+
+            # print("\n---------------------------------------------------------------")
             
             if Op_Selecao == 1:
                 pares = selecaoRoleta(Populacao)
@@ -293,20 +313,25 @@ def main():
             
             x = geracao
             y = float(fitnessMedio(Populacao))
-            xInd = geracao
-            yInd = float(melhorElemento(Populacao))
+            xMInd = geracao
+            yMInd = float(melhorElemento(Populacao))
+            xPInd = geracao
+            yPInd = float(piorElemento(Populacao))
             xSolucaoOtima.append(geracao)
             ySolucaoOtima.append(27)
 
             xMedia.append(x) 
             yMedia.append(y)
-            xMelhorInd.append(xInd)
-            yMelhorInd.append(yInd)
+            xMelhorInd.append(xMInd)
+            yMelhorInd.append(yMInd)
+            xPiorInd.append(xPInd)
+            yPiorInd.append(yPInd)
             
         
             geracao = geracao + 1
 
     plt.figure(figsize=(5, 2.7), layout='constrained')
+    plt.plot(xPiorInd, yPiorInd, label='Pior indivíduo da população') 
     plt.plot(xMedia, yMedia, label='Media das populações') 
     plt.plot(xMelhorInd, yMelhorInd, label='Melhor indivíduo da população') 
     plt.plot(xSolucaoOtima, ySolucaoOtima, label='Solução ótima conhecida')
