@@ -1,5 +1,6 @@
 import random
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 # Parâmetros do problema
@@ -114,6 +115,7 @@ def selecaoTorneio(pop):
 
     return pares
 
+# Cruzamento entre 2 indivíduos utilizando 1 ponto de corte
 def cruzamentoUmponto(ind1, ind2):
     genes_filho = []
     
@@ -131,6 +133,7 @@ def cruzamentoUmponto(ind1, ind2):
     }
     return filho
 
+# Cruzamento entre 2 indivíduos utilizando 2 pontos de corte
 def cruzamentoDoispontos(ind1, ind2):
     genes_filho = []
     
@@ -151,6 +154,7 @@ def cruzamentoDoispontos(ind1, ind2):
     }
     return filho
 
+# Realiza mutacao por escolha aleatória de um bit
 def mutacao(ind):
     geneAleatorio = random.randint(0, GENES-1)
     indMutado = {
@@ -164,9 +168,8 @@ def mutacao(ind):
 
     return indMutado
 
-"""
-    Aplica os operadores genéticos de cruzamento e mutação utilizando o vetor de pares.
-"""
+
+ # Aplica os operadores genéticos de cruzamento e mutação utilizando o vetor de pares.
 
 def operadoresGeneticos(pares, opCruzamento):
     pop_nova = []
@@ -208,6 +211,7 @@ def elitismo(pop_antiga, pop_nova):
     pop_nova[0] = pop_antiga[melhorElemento]
 
 
+# Calcula a media de Fitness de uma populacao
 def fitnessMedio(pop):
     soma = 0
     for ind in pop:
@@ -217,6 +221,7 @@ def fitnessMedio(pop):
 
     return media
 
+# Seleciona o melhor elemento da populacao
 def melhorElemento(pop):
     melhorElemento = 0
     for i in range(len(pop)):
@@ -225,9 +230,9 @@ def melhorElemento(pop):
 
     return pop[i]['fitness']
             
-"""
-    LOOP principal do AG
-"""
+
+# LOOP principal do AG
+
 
 def main():
 
@@ -260,43 +265,46 @@ def main():
     yMelhorInd = []
     xSolucaoOtima = []
     ySolucaoOtima = []
-    while geracao < MAX_GERACOES:
+    with tqdm(total=MAX_GERACOES) as geracoes:
+        for geracao in range(MAX_GERACOES):
 
-        print("Geração: ", geracao)
+            geracoes.update(1)
 
-        # print("Melhor elemento >>>", melhorElemento(Populacao))
-        # print("Media da populacao >>>", fitnessMedio(Populacao))
+            # print("Geração: ", geracao)
+
+            # print("Melhor elemento >>>", melhorElemento(Populacao))
+            # print("Media da populacao >>>", fitnessMedio(Populacao))
+            
+            if Op_Selecao == 1:
+                pares = selecaoRoleta(Populacao)
+            else:
+                pares = selecaoTorneio(Populacao)
+            
+            popFilha = operadoresGeneticos(pares, Op_Cruzamento)
+            avaliacao(popFilha)
+
+            if Op_Elitismo == 1:
+                elitismo(Populacao, popFilha)
+                Populacao = popFilha
+            else:
+                Populacao = popFilha
+
+            avaliacao(Populacao)
+            
+            x = geracao
+            y = float(fitnessMedio(Populacao))
+            xInd = geracao
+            yInd = float(melhorElemento(Populacao))
+            xSolucaoOtima.append(geracao)
+            ySolucaoOtima.append(27)
+
+            xMedia.append(x) 
+            yMedia.append(y)
+            xMelhorInd.append(xInd)
+            yMelhorInd.append(yInd)
+            
         
-        if Op_Selecao == 1:
-            pares = selecaoRoleta(Populacao)
-        else:
-            pares = selecaoTorneio(Populacao)
-        
-        popFilha = operadoresGeneticos(pares, Op_Cruzamento)
-        avaliacao(popFilha)
-
-        if Op_Elitismo == 1:
-            elitismo(Populacao, popFilha)
-            Populacao = popFilha
-        else:
-            Populacao = popFilha
-
-        avaliacao(Populacao)
-        
-        x = geracao
-        y = float(fitnessMedio(Populacao))
-        xInd = geracao
-        yInd = float(melhorElemento(Populacao))
-        xSolucaoOtima.append(geracao)
-        ySolucaoOtima.append(27)
-
-        xMedia.append(x) 
-        yMedia.append(y)
-        xMelhorInd.append(xInd)
-        yMelhorInd.append(yInd)
-        
-    
-        geracao = geracao + 1
+            geracao = geracao + 1
 
     plt.figure(figsize=(5, 2.7), layout='constrained')
     plt.plot(xMedia, yMedia, label='Media das populações') 
@@ -308,6 +316,4 @@ def main():
     plt.legend()
     plt.show()
     
-
-
-print(main())
+main()
