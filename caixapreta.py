@@ -9,10 +9,10 @@ GENES = 36
 
 # Parâmetros do AG
 
-MAX_GERACOES = 60
-TAM_POPULACAO = 10
-PROB_CRUZAMENTO = 0.93
-PROB_MUTACAO = 0.07
+MAX_GERACOES = 0
+TAM_POPULACAO = 0
+PROB_CRUZAMENTO = 0.0
+PROB_MUTACAO = 0.0
 
 # Gera um indivíduo aleatório
 def geraIndividuo ():
@@ -231,6 +231,8 @@ def melhorElemento(pop):
 
     return pop[melhorElemento]['fitness']
             
+
+# Seleciona o pior elemento da população
 def piorElemento(pop):
     piorElemento = 0
     for i in range(len(pop)):
@@ -240,7 +242,6 @@ def piorElemento(pop):
     return pop[piorElemento]['fitness']
 
 # LOOP principal do AG
-
 
 def main():
 
